@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
+import QRCode from 'react-qr-code';
 import { Language, PrintFormat, PrintMaterial, UrgencyOption, SampleImage } from '../types';
 import { TRANSLATIONS, FORMATS, MATERIALS, URGENCY_OPTIONS, SAMPLE_IMAGES } from '../data';
 import { 
@@ -19,107 +20,12 @@ import {
   Palette
 } from 'lucide-react';
 
-function getDynamicMockQrGrid(data: string): boolean[][] {
-  const size = 21; // 21x21 Version 1 QR matrix
-  const grid = Array(size).fill(null).map(() => Array(size).fill(false));
-
-  const fillRect = (startX: number, startY: number, w: number, h: number, val: boolean) => {
-    for (let dy = 0; dy < h; dy++) {
-      for (let dx = 0; dx < w; dx++) {
-        if (startY + dy < size && startX + dx < size) {
-          grid[startY + dy][startX + dx] = val;
-        }
-      }
-    }
-  };
-
-  const drawLocator = (cx: number, cy: number) => {
-    const startX = cx - 3;
-    const startY = cy - 3;
-    fillRect(startX, startY, 7, 7, true);
-    fillRect(startX + 1, startY + 1, 5, 5, false);
-    fillRect(startX + 2, startY + 2, 3, 3, true);
-  };
-
-  // Draw locators
-  drawLocator(3, 3);
-  drawLocator(17, 3);
-  drawLocator(3, 17);
-
-  // Set quiet/separator zones
-  for (let i = 0; i < 8; i++) {
-    if (i < size) {
-      grid[7][i] = false;
-      grid[i][7] = false;
-    }
-  }
-  for (let i = 13; i < size; i++) {
-    grid[7][i] = false;
-    grid[i][13] = false;
-  }
-  for (let i = 13; i < size; i++) {
-    grid[13][i] = false;
-    grid[i][7] = false;
-  }
-
-  // Timing markers
-  for (let i = 8; i < 13; i++) {
-    grid[6][i] = i % 2 === 0;
-    grid[i][6] = i % 2 === 0;
-  }
-
-  // Generate deterministic pseudo-random matrix based on dataset string hash
-  let hash = 0;
-  for (let i = 0; i < data.length; i++) {
-    hash = (hash << 5) - hash + data.charCodeAt(i);
-    hash |= 0;
-  }
-
-  let seed = Math.abs(hash) || 543219876;
-  const nextRandom = () => {
-    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
-    return seed / 0x7fffffff;
-  };
-
-  for (let r = 0; r < size; r++) {
-    for (let c = 0; c < size; c++) {
-      const isTopLeft = r <= 7 && c <= 7;
-      const isTopRight = r <= 7 && c >= 13;
-      const isBottomLeft = r >= 13 && c <= 7;
-      const isTiming = (r === 6 && c >= 8 && c <= 12) || (c === 6 && r >= 8 && r <= 12);
-
-      if (!isTopLeft && !isTopRight && !isBottomLeft && !isTiming) {
-        grid[r][c] = nextRandom() > 0.45;
-      }
-    }
-  }
-
-  return grid;
-}
-
 function MockQrCode({ value, lang }: { value: string; lang: Language }) {
-  const grid = getDynamicMockQrGrid(value);
   return (
     <div className="flex flex-col items-center gap-1.5 p-1.5 bg-white border border-white/15 flex-shrink-0">
-      <svg viewBox="0 0 21 21" className="w-[100px] h-[100px] bg-white p-0.5 select-none" id="live-generated-qr">
-        {grid.map((row, rIdx) => 
-          row.map((cell, cIdx) => {
-            if (cell) {
-              return (
-                <rect
-                  key={`${rIdx}-${cIdx}`}
-                  x={cIdx}
-                  y={rIdx}
-                  width="1"
-                  height="1"
-                  fill="#000000"
-                />
-              );
-            }
-            return null;
-          })
-        )}
-      </svg>
+      <div className="bg-white p-0.5 w-[100px] h-[100px] flex items-center justify-center">
+        <QRCode value={value} size={92} style={{ height: "auto", maxWidth: "100%", width: "100%" }} id="live-generated-qr" />
+      </div>
       <span className="font-mono text-[8px] text-black tracking-widest font-black uppercase text-center leading-none">
         {value}
       </span>
