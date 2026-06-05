@@ -1,0 +1,6 @@
+{
+  "name": "AI Print Automation Platform",
+  "description": "SaaS platform that automates printing houses: order intake, layout prep, cost estimation, smart queue, and QR-code delivery.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
