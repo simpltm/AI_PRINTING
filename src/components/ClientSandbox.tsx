@@ -21,10 +21,11 @@ import {
 } from 'lucide-react';
 
 function MockQrCode({ value, lang }: { value: string; lang: Language }) {
+  const qrUrl = window.location.origin + window.location.pathname + "?order=" + encodeURIComponent(value);
   return (
     <div className="flex flex-col items-center gap-1.5 p-1.5 bg-white border border-white/15 flex-shrink-0">
       <div className="bg-white p-0.5 w-[100px] h-[100px] flex items-center justify-center">
-        <QRCode value={value} size={92} style={{ height: "auto", maxWidth: "100%", width: "100%" }} id="live-generated-qr" />
+        <QRCode value={qrUrl} size={92} style={{ height: "auto", maxWidth: "100%", width: "100%" }} id="live-generated-qr" />
       </div>
       <span className="font-mono text-[8px] text-black tracking-widest font-black uppercase text-center leading-none">
         {value}

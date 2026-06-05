@@ -6,6 +6,7 @@ import LandingAbout from './components/LandingAbout';
 import ClientSandbox from './components/ClientSandbox';
 import OwnerCalculator from './components/OwnerCalculator';
 import PricingTiers from './components/PricingTiers';
+import OrderTrackingPanel from './components/OrderTrackingPanel';
 import { 
   Building2, 
   Smartphone, 
@@ -22,6 +23,14 @@ import {
 export default function App() {
   const [lang, setLang] = useState<Language>('uz');
   const [activeTab, setActiveTab] = useState<'landing' | 'client_demo' | 'owner_calc'>('landing');
+
+  // Check if we are scanning a specific order URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const scannedOrderId = urlParams.get('order');
+
+  if (scannedOrderId) {
+    return <OrderTrackingPanel orderId={scannedOrderId} lang={lang} />;
+  }
 
   const getTranslation = (key: string) => {
     return TRANSLATIONS[key]?.[lang] || key;
